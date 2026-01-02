@@ -33,13 +33,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Enterprise plan requires contact sales' }, { status: 400 })
     }
 
-    // 确定要使用的价格ID
+    // 确定支付模式和价格ID
+    const isPointsPurchase = planType === 'starter' || planType === 'popular' || planType === 'premium'
     let finalPriceId = priceId
-    
+
     // 如果前端传递的价格ID为空或无效，使用服务端的配置
     if (!priceId || priceId.trim() === '') {
       if (planType === 'pro') {
         finalPriceId = actualPriceIds.pro
+      } else if (isPointsPurchase) {
+        finalPriceId = actualPriceIds[planType as keyof typeof actualPriceIds]
       } else {
         return NextResponse.json({ error: 'Missing price ID for plan type' }, { status: 400 })
       }
@@ -86,15 +89,29 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      mode: 'subscription',
+      mode: isPointsPurchase ? 'payment' : 'subscription',
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/${validLocale}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/${validLocale}/#pricing`,
       metadata: {
         userId: session.user.id || '',
         planType,
         locale: validLocale,
+        ...(isPointsPurchase && {
+          type: 'points_purchase',
+          points: getPointsForPlan(planType),
+        }),
       },
     })
+
+    // 辅助函数：获取积分数量
+    function getPointsForPlan(planType: string): string {
+      const pointsMap: Record<string, string> = {
+        starter: '5000',
+        popular: '10000',
+        premium: '100000',
+      }
+      return pointsMap[planType] || '0'
+    }
 
     return NextResponse.json({ sessionId: checkoutSession.id })
   } catch (error) {

@@ -1,7 +1,7 @@
 import { db } from './db'
 import { stripePayments, users } from './schema'
 import { eq, desc, and, sql } from 'drizzle-orm'
-import { v4 as uuidv4 } from 'uuid'
+import { nanoid } from 'nanoid'
 
 // 支付状态枚举
 export enum PaymentStatus {
@@ -74,7 +74,7 @@ export async function createPaymentRecord(data: {
 }) {
   try {
     const paymentRecord = await db.insert(stripePayments).values({
-      id: uuidv4(),
+      id: nanoid(),
       userId: data.userId,
       stripeCustomerId: data.stripeCustomerId,
       paymentIntentId: data.paymentIntentId,

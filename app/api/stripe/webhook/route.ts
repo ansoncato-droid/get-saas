@@ -4,7 +4,7 @@ import Stripe from 'stripe'
 import { db } from '@/lib/db'
 import { users, pointsHistory, stripePayments } from '@/lib/schema'
 import { eq, sql } from 'drizzle-orm'
-import { v4 as uuidv4 } from 'uuid'
+import { nanoid } from 'nanoid'
 import { createPaymentRecord, PaymentStatus, PaymentType } from '@/lib/payments'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
           // 记录积分历史
           await db.insert(pointsHistory).values({
-            id: uuidv4(),
+            id: nanoid(),
             userId,
             points,
             pointsType: 'purchased',
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
 
           // 记录赠送积分历史
           await db.insert(pointsHistory).values({
-            id: uuidv4(),
+            id: nanoid(),
             userId: user[0].id,
             points: 10000,
             pointsType: 'gifted',
@@ -263,7 +263,7 @@ export async function POST(request: NextRequest) {
 
             // 记录积分历史
             await db.insert(pointsHistory).values({
-              id: uuidv4(),
+              id: nanoid(),
               userId,
               points,
               pointsType: 'purchased',
@@ -408,7 +408,7 @@ export async function POST(request: NextRequest) {
 
             // 记录积分清零历史
             await db.insert(pointsHistory).values({
-              id: uuidv4(),
+              id: nanoid(),
               userId: currentUser.id,
               points: -pointsToRemove,
               pointsType: 'gifted',

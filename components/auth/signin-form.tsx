@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
@@ -25,6 +25,7 @@ export function SignInForm() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<string | null>(null)
+  const [callbackUrl, setCallbackUrl] = useState('')
   const router = useRouter()
 
   // 根据语言环境构建正确的路径
@@ -32,14 +33,11 @@ export function SignInForm() {
     return locale === "en" ? `/en${path}` : `/zh${path}`
   }
 
-  // 获取回调URL
-  const getCallbackUrl = () => {
-    if (typeof window !== 'undefined') {
-      const searchParams = new URLSearchParams(window.location.search)
-      return searchParams.get('callbackUrl') || getLocalizedPath('/')
-    }
-    return getLocalizedPath('/')
-  }
+  // 在客户端初始化 callbackUrl
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    setCallbackUrl(searchParams.get('callbackUrl') || getLocalizedPath('/'))
+  }, [locale])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,7 +54,6 @@ export function SignInForm() {
       if (result?.error) {
         setError(t('login_error'))
       } else {
-        const callbackUrl = getCallbackUrl()
         router.push(callbackUrl)
         router.refresh()
       }
@@ -71,7 +68,7 @@ export function SignInForm() {
     setOauthLoading(provider)
     try {
       await signIn(provider, {
-        callbackUrl: getCallbackUrl(),
+        callbackUrl: callbackUrl,
       })
     } catch (error) {
       setError(t('login_failed'))
@@ -226,12 +223,10 @@ export function SignInForm() {
           <div className="text-center text-sm text-muted-foreground">
             {t('no_account')}{' '}
             <Link
-              href={(() => {
-                const callbackUrl = getCallbackUrl()
-                return callbackUrl
-                  ? `${getLocalizedPath('/auth/signup')}?callbackUrl=${encodeURIComponent(callbackUrl)}`
-                  : getLocalizedPath('/auth/signup')
-              })()}
+              href={callbackUrl
+                ? `${getLocalizedPath('/auth/signup')}?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                : getLocalizedPath('/auth/signup')
+              }
               className="text-primary hover:text-primary/80 font-medium"
             >
               {t('signup_now')}

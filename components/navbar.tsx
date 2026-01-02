@@ -110,7 +110,7 @@ export function Navbar() {
           {/* Right side controls */}
           <div className="hidden md:flex items-center space-x-4">
             {/* Language Switcher */}
-            <DropdownMenu>
+            <DropdownMenu key="lang-switcher-desktop">
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary hover:bg-secondary transition-all duration-300">
                   <Globe className="h-4 w-4 mr-2 text-primary" />
@@ -136,7 +136,7 @@ export function Navbar() {
             {status === "loading" ? (
               <div className="w-8 h-8 animate-pulse bg-secondary rounded-full" />
             ) : session ? (
-              <DropdownMenu>
+              <DropdownMenu key="user-menu-desktop">
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="flex items-center space-x-2 text-muted-foreground hover:text-primary hover:bg-secondary transition-all duration-300">
                     <User className="h-4 w-4 text-primary" />
@@ -247,7 +247,7 @@ export function Navbar() {
 
                 {/* Controls Mobile */}
                 <div className="flex items-center space-x-2 px-3 py-2">
-                  <DropdownMenu>
+                  <DropdownMenu key="lang-switcher-mobile">
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary hover:bg-primary/20 transition-all duration-300">
                         <Globe className="h-4 w-4 mr-2 text-primary" />

@@ -255,7 +255,7 @@ export function Footer() {
             </div>
 
             {/* Language Switcher */}
-            <DropdownMenu>
+            <DropdownMenu key="lang-switcher-footer">
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary hover:bg-secondary/50 transition-all duration-300">
                   <Globe className="h-4 w-4 mr-2" />

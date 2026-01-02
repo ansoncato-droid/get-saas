@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { users, emailVerificationTokens } from '@/lib/schema'
 import { eq } from 'drizzle-orm'
-import { v4 as uuidv4 } from 'uuid'
+import { nanoid } from 'nanoid'
 import { sendVerificationEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
@@ -47,12 +47,12 @@ export async function POST(request: NextRequest) {
     await db.delete(emailVerificationTokens).where(eq(emailVerificationTokens.email, user.email))
 
     // 生成新的验证令牌
-    const token = uuidv4()
+    const token = nanoid()
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24小时后过期
 
     // 保存新的验证令牌
     await db.insert(emailVerificationTokens).values({
-      id: uuidv4(),
+      id: nanoid(),
       email: user.email,
       token,
       expires,

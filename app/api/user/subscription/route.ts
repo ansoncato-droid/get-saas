@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { users, pointsHistory } from '@/lib/schema'
 import { eq, sql } from 'drizzle-orm'
-import { v4 as uuidv4 } from 'uuid'
+import { nanoid } from 'nanoid'
 
 export async function GET(request: NextRequest) {
   try {
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
       // 记录积分清零历史
       await db.insert(pointsHistory).values({
-        id: uuidv4(),
+        id: nanoid(),
         userId: user.id,
         points: -(user.giftedPoints || 0),
         pointsType: 'gifted',

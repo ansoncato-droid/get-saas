@@ -1,7 +1,7 @@
 import { db } from '@/lib/db'
 import { users, pointsHistory } from '@/lib/schema'
 import { eq, sql } from 'drizzle-orm'
-import { v4 as uuidv4 } from 'uuid'
+import { nanoid } from 'nanoid'
 
 // 积分使用策略：优先使用赠送积分，再使用购买积分
 export async function usePoints(userId: string, pointsToUse: number, description: string) {
@@ -51,7 +51,7 @@ export async function usePoints(userId: string, pointsToUse: number, description
     // 记录积分使用历史
     if (giftedPointsUsed > 0) {
       await db.insert(pointsHistory).values({
-        id: uuidv4(),
+        id: nanoid(),
         userId,
         points: -giftedPointsUsed,
         pointsType: 'gifted',
@@ -63,7 +63,7 @@ export async function usePoints(userId: string, pointsToUse: number, description
 
     if (purchasedPointsUsed > 0) {
       await db.insert(pointsHistory).values({
-        id: uuidv4(),
+        id: nanoid(),
         userId,
         points: -purchasedPointsUsed,
         pointsType: 'purchased',
@@ -128,7 +128,7 @@ export async function getUserPointsDetail(userId: string) {
 
       // 记录积分清零历史
       await db.insert(pointsHistory).values({
-        id: uuidv4(),
+        id: nanoid(),
         userId: currentUser.id,
         points: -(currentUser.giftedPoints || 0),
         pointsType: 'gifted',
@@ -186,7 +186,7 @@ export async function addPointsManually(userId: string, points: number, type: 'p
 
     // 记录积分历史
     await db.insert(pointsHistory).values({
-      id: uuidv4(),
+      id: nanoid(),
       userId,
       points,
       pointsType: type,
